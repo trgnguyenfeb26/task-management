@@ -26,9 +26,7 @@ const Routes = () => {
         <Route exact path="/">
           {isLoggedIn ? <ProjectsPage /> : <Redirect to="/login" />}
         </Route>
-        <Route exact path="/dashboard">
-          {isLoggedIn ? <DashboardPage /> : <Redirect to="/login" />}
-        </Route>
+
         <Route exact path="/projects/:projectId">
           {isLoggedIn ? <ProjectDetailsPage /> : <Redirect to="/login" />}
         </Route>

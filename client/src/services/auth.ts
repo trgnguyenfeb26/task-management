@@ -1,7 +1,14 @@
 import axios from 'axios';
 import backendUrl from '../backendUrl';
 
-interface Credentials {
+interface RegisterPayload {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface LoginPayload {
   username: string;
   password: string;
 }
@@ -20,12 +27,13 @@ export const setConfig = () => {
   };
 };
 
-const login = async (credentials: Credentials) => {
+const login = async (credentials: LoginPayload) => {
   const response = await axios.post(`${backendUrl}/login`, credentials);
   return response.data;
 };
 
-const signup = async (credentials: Credentials) => {
+const signup = async (credentials: RegisterPayload) => {
+  console.log('credentials', credentials);
   const response = await axios.post(`${backendUrl}/signup`, credentials);
   return response.data;
 };

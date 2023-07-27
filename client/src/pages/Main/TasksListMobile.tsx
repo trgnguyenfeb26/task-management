@@ -91,6 +91,7 @@ const TasksListMobile: React.FC<{ tasks: TaskState[] }> = ({ tasks }) => {
                   title: b.title,
                   description: b.description,
                   priority: b.priority,
+                  assignedUsers: b.assignedUsers.map((u) => u),
                 }}
                 isResolved={b.isResolved}
                 iconSize="default"

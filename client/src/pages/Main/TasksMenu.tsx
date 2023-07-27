@@ -16,6 +16,7 @@ import DoneOutlineIcon from '@material-ui/icons/DoneOutline';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import CommentOutlinedIcon from '@material-ui/icons/CommentOutlined';
+import AssignIcon from '@material-ui/icons/AssignmentInd';
 
 interface TasksMenuProps {
   projectId: string;
@@ -55,6 +56,7 @@ const TasksMenu: React.FC<TasksMenuProps> = ({
   const handleReopenTask = () => {
     dispatch(closeReopenTask(projectId, taskId, 'reopen'));
   };
+  console.log('currentData', currentData);
 
   return (
     <div>
@@ -156,6 +158,7 @@ const TasksMenu: React.FC<TasksMenuProps> = ({
         >
           <NoteForm isEditMode={false} projectId={projectId} taskId={taskId} />
         </FormDialog>
+
       </Menu>
     </div>
   );

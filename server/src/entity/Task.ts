@@ -11,6 +11,7 @@ import {
 import { Project } from './Project';
 import { User } from './User';
 import { Note } from './Note';
+import { Assigned } from './Assigned';
 
 type Priority = 'low' | 'medium' | 'high';
 
@@ -80,4 +81,7 @@ export class Task extends BaseEntity {
 
   @Column({ nullable: true })
   updatedAt: Date;
+
+  @OneToMany(() => Assigned, (assigned) => assigned.task) 
+  assignedUsers: Assigned[];
 }

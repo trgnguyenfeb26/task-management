@@ -78,7 +78,7 @@ const DashboardPage: React.FC = () => {
       tasksChart[index].value += 1;
     }
     if (tasksDoneState[i].closedAt != null) {
-      const dateStr = tasksDoneState[i].closedAt?.toString().replace(/^(\d{4})-(\d{2})-(\d{2}).*/, '$3/$2/$1');
+      const dateStr = tasksDoneState[i].createdAt?.toString().replace(/^(\d{4})-(\d{2})-(\d{2}).*/, '$3/$2/$1');
       console.log('dateStr', dateStr);
       const index = tasksDoneChart.findIndex((item: any) => item.name === dateStr);
       if (index === -1) {

@@ -4,6 +4,7 @@ import { Task } from '../entity/Task';
 import { Note } from '../entity/Note';
 import { Project } from '../entity/Project';
 import { createTaskValidator } from '../utils/validators';
+import { Assigned } from '../entity/Assigned';
 
 const fieldsToSelect = [
   'task.id',
@@ -31,36 +32,38 @@ const fieldsToSelect = [
   'note.updatedAt',
   'noteAuthor.id',
   'noteAuthor.username',
+  'assigned.id',
+  'assigned.joinedAt',
+  'user.id',
+  'user.username',
 ];
 
 export const getTasks = async (req: Request, res: Response) => {
   const { projectId } = req.params;
-
   const projectMembers = await Member.find({ projectId });
-
   if (!projectMembers.map((m) => m.memberId).includes(req.user)) {
     return res.status(401).send({ message: 'Access is denied.' });
   }
-
   const tasks = await Task.createQueryBuilder('task')
-    .where('"projectId" = :projectId', { projectId })
     .leftJoinAndSelect('task.createdBy', 'createdBy')
     .leftJoinAndSelect('task.updatedBy', 'updatedBy')
     .leftJoinAndSelect('task.closedBy', 'closedBy')
     .leftJoinAndSelect('task.reopenedBy', 'reopenedBy')
     .leftJoinAndSelect('task.notes', 'note')
     .leftJoinAndSelect('note.author', 'noteAuthor')
+    .leftJoinAndSelect('task.assignedUsers', 'assigned') // Updated relation name
+    .leftJoinAndSelect('assigned.user', 'user')
+    .where('task.projectId = :projectId', { projectId })
     .select(fieldsToSelect)
     .getMany();
-
   res.json(tasks);
 };
 
-export const getTasksDone = async (req: Request,res: Response) => {
-  console.log('req',req);
-    const tasksDone = await Task.createQueryBuilder('task')
-      .getMany();
-    return res.json(tasksDone);
+export const getTasksDone = async (req: Request, res: Response) => {
+  console.log('req', req);
+  const tasksDone = await Task.createQueryBuilder('task')
+    .getMany();
+  return res.json(tasksDone);
 
 };
 
@@ -68,18 +71,12 @@ export const getTasksDone = async (req: Request,res: Response) => {
 export const createTask = async (req: Request, res: Response) => {
   const { title, description, priority } = req.body;
   const { projectId } = req.params;
-
+  console.log('req.body', req.body);
+  const assignedUsersIds: string[] = req.body.assignedUsers || [];
   const { errors, valid } = createTaskValidator(title, description, priority);
 
   if (!valid) {
     return res.status(400).send({ message: Object.values(errors)[0] });
-  }
-
-  const projectMembers = await Member.find({ projectId });
-  const memberIds = projectMembers.map((m) => m.memberId);
-
-  if (!memberIds.includes(req.user)) {
-    return res.status(401).send({ message: 'Access is denied.' });
   }
 
   const newTask = Task.create({
@@ -91,6 +88,12 @@ export const createTask = async (req: Request, res: Response) => {
   });
   await newTask.save();
 
+  const membersArray = assignedUsersIds.map((userId) => ({
+    userId: userId,
+    taskId: newTask.id,
+  }));
+  await Assigned.insert(membersArray);
+
   const relationedTask = await Task.createQueryBuilder('task')
     .where('task.id = :taskId', { taskId: newTask.id })
     .leftJoinAndSelect('task.createdBy', 'createdBy')
@@ -99,6 +102,8 @@ export const createTask = async (req: Request, res: Response) => {
     .leftJoinAndSelect('task.reopenedBy', 'reopenedBy')
     .leftJoinAndSelect('task.notes', 'note')
     .leftJoinAndSelect('note.author', 'noteAuthor')
+    .leftJoinAndSelect('task.assignedUsers', 'assigned') // Updated relation name
+    .leftJoinAndSelect('assigned.user', 'user')
     .select(fieldsToSelect)
     .getOne();
 
@@ -108,6 +113,7 @@ export const createTask = async (req: Request, res: Response) => {
 export const updateTask = async (req: Request, res: Response) => {
   const { title, description, priority } = req.body;
   const { projectId, taskId } = req.params;
+  const assignedUsersIds: string[] = req.body.assignedUsers || [];
 
   const { errors, valid } = createTaskValidator(title, description, priority);
 
@@ -135,6 +141,17 @@ export const updateTask = async (req: Request, res: Response) => {
   targetTask.updatedAt = new Date();
 
   await targetTask.save();
+
+  await Assigned.delete({ taskId });
+  const membersArray = assignedUsersIds.map((userId) => ({
+    userId: userId,
+    taskId: targetTask.id,
+  }));
+  if (membersArray.length > 0) {
+    await Assigned.insert(membersArray);
+  }
+
+
   const relationedTask = await Task.createQueryBuilder('task')
     .where('task.id = :taskId', { taskId })
     .leftJoinAndSelect('task.createdBy', 'createdBy')
@@ -143,6 +160,8 @@ export const updateTask = async (req: Request, res: Response) => {
     .leftJoinAndSelect('task.reopenedBy', 'reopenedBy')
     .leftJoinAndSelect('task.notes', 'note')
     .leftJoinAndSelect('note.author', 'noteAuthor')
+    .leftJoinAndSelect('task.assignedUsers', 'assigned') // Updated relation name
+    .leftJoinAndSelect('assigned.user', 'user')
     .select(fieldsToSelect)
     .getOne();
 
@@ -174,6 +193,7 @@ export const deleteTask = async (req: Request, res: Response) => {
   }
 
   await Note.delete({ taskId });
+  await Assigned.delete({ taskId });
   await targetTask.remove();
   res.status(204).end();
 };
@@ -215,6 +235,8 @@ export const closeTask = async (req: Request, res: Response) => {
     .leftJoinAndSelect('task.reopenedBy', 'reopenedBy')
     .leftJoinAndSelect('task.notes', 'note')
     .leftJoinAndSelect('note.author', 'noteAuthor')
+    .leftJoinAndSelect('task.assignedUsers', 'assigned') // Updated relation name
+    .leftJoinAndSelect('assigned.user', 'user')
     .select(fieldsToSelect)
     .getOne();
 
@@ -258,6 +280,8 @@ export const reopenTask = async (req: Request, res: Response) => {
     .leftJoinAndSelect('task.reopenedBy', 'reopenedBy')
     .leftJoinAndSelect('task.notes', 'note')
     .leftJoinAndSelect('note.author', 'noteAuthor')
+    .leftJoinAndSelect('task.assignedUsers', 'assigned') // Updated relation name
+    .leftJoinAndSelect('assigned.user', 'user')
     .select(fieldsToSelect)
     .getOne();
 

@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../store';
 import authService from '../../services/auth';
 import storage from '../../utils/localStorage';
-import { CredentialsPayload, UserState } from '../types';
+import { LoginPayload, RegisterPayload, UserState } from '../types';
 import { fetchProjects } from './projectsSlice';
 import { notify } from './notificationSlice';
 import { fetchUsers } from './usersSlice';
@@ -54,7 +54,7 @@ export const {
   clearAuthError,
 } = authSlice.actions;
 
-export const login = (credentials: CredentialsPayload): AppThunk => {
+export const login = (credentials: LoginPayload): AppThunk => {
   return async (dispatch) => {
     try {
       dispatch(setAuthLoading());
@@ -73,7 +73,7 @@ export const login = (credentials: CredentialsPayload): AppThunk => {
   };
 };
 
-export const signup = (credentials: CredentialsPayload): AppThunk => {
+export const signup = (credentials: RegisterPayload): AppThunk => {
   return async (dispatch) => {
     try {
       dispatch(setAuthLoading());

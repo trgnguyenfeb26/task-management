@@ -6,6 +6,12 @@ export class User extends BaseModel {
   @Column({ type: 'varchar', length: 20 })
   username: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  email: string;
+
   @Column()
   passwordHash: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  name: string;
 }

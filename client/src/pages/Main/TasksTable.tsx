@@ -23,6 +23,7 @@ const tableHeaders = [
   'Added',
   'Updated',
   'Notes',
+  'Assigned',
   'Actions',
 ];
 
@@ -91,6 +92,12 @@ const TasksTable: React.FC<{ tasks: TaskState[] }> = ({ tasks }) => {
               </TableCell>
               <TableCell align="center">{b.notes.length}</TableCell>
               <TableCell align="center">
+                {/* <Avatar className={classes.avatar}>
+              {user.username.slice(0, 1)}
+            </Avatar> */}
+                {b.assignedUsers ? b.assignedUsers.map((u) => u.user.username).join(', ') : 'n/a'}
+              </TableCell>
+              <TableCell align="center">
                 <TasksMenu
                   projectId={b.projectId}
                   taskId={b.id}
@@ -98,6 +105,7 @@ const TasksTable: React.FC<{ tasks: TaskState[] }> = ({ tasks }) => {
                     title: b.title,
                     description: b.description,
                     priority: b.priority,
+                    assignedUsers: b.assignedUsers.map((u) => u),
                   }}
                   isResolved={b.isResolved}
                 />

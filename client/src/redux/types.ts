@@ -48,10 +48,17 @@ export interface TaskState {
   updatedBy?: User;
   closedBy?: User;
   reopenedBy?: User;
-  closedAt?: Date | string;
+  closedAt?: Date;
   reopenedAt?: Date;
   updatedAt?: Date;
   createdAt: Date;
+  assignedUsers: AssignedUser[];
+}
+
+export interface AssignedUser {
+  id: string;
+  joinedAt: Date;
+  user: User;
 }
 
 export type ProjectSortValues =
@@ -79,10 +86,18 @@ export type TaskSortValues =
 
 export type TaskFilterValues = 'all' | 'closed' | 'open';
 
-export interface CredentialsPayload {
+export interface RegisterPayload {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginPayload {
   username: string;
   password: string;
 }
+
 
 export interface ProjectPayload {
   name: string;
@@ -93,6 +108,7 @@ export interface TaskPayload {
   title: string;
   description: string;
   priority: TaskPriority;
+  assignedUsers?: AssignedUser[]
 }
 
 export interface EditedTaskData extends TaskPayload {

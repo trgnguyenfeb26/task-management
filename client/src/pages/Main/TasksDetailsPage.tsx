@@ -22,6 +22,7 @@ import RedoIcon from '@material-ui/icons/Redo';
 import DoneOutlineIcon from '@material-ui/icons/DoneOutline';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import GroupIcon from '@material-ui/icons/Group';
 
 interface ParamTypes {
   projectId: string;
@@ -71,6 +72,7 @@ const TasksDetailsPage = () => {
     reopenedBy,
     reopenedAt,
     notes,
+    assignedUsers,
   } = task;
 
   const handleDeleteTask = () => {
@@ -160,7 +162,7 @@ const TasksDetailsPage = () => {
           isEditMode={true}
           projectId={projectId}
           taskId={id}
-          currentData={{ title, description, priority }}
+          currentData={{ title, description, priority, assignedUsers }}
         />
       </FormDialog>
     );
@@ -227,6 +229,17 @@ const TasksDetailsPage = () => {
             <strong>{updatedBy.username}</strong>
           </Typography>
         )}
+        <Typography color="secondary" variant="subtitle2">
+          Assigned Users:{' '}
+          {assignedUsers.length > 0 ? (
+            <span>
+              <GroupIcon style={{ verticalAlign: 'middle' }} />{' '}
+              {assignedUsers.map((u) => u.user.username).join(', ')}
+            </span>
+          ) : (
+            <em>None</em>
+          )}
+        </Typography>
         <div className={classes.btnsWrapper}>
           {closeReopenBtns()}
           {updateTaskBtn()}

@@ -21,6 +21,8 @@ import {
   IconButton,
   Link,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core';
 import { useAuthPageStyles } from '../../styles/muiStyles';
 import PersonIcon from '@material-ui/icons/Person';
@@ -29,14 +31,23 @@ import EnhancedEncryptionIcon from '@material-ui/icons/EnhancedEncryption';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import EmailIcon from '@material-ui/icons/Email';
+import NameIcon from '@material-ui/icons/AccountCircle';
 
 interface InputValues {
+  name: string;
   username: string;
   password: string;
+  email: string;
   confirmPassword: string;
 }
 
 const validationSchema = yup.object({
+  name: yup
+    .string()
+    .required('Required')
+    .max(60, 'Must be at most 60 characters')
+    .min(3, 'Must be at least 3 characters'),
   username: yup
     .string()
     .required('Required')
@@ -46,6 +57,10 @@ const validationSchema = yup.object({
       /^[a-zA-Z0-9-_]*$/,
       'Only alphanum, dash & underscore characters are allowed'
     ),
+  email: yup
+    .string()
+    .required('Required')
+    .email('Must be a valid email address'),
   password: yup
     .string()
     .required('Required')
@@ -66,23 +81,51 @@ const SignupPage = () => {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   });
+  console.log(errors);
 
   const handleSignup = ({
+    name,
     username,
+    email,
     password,
     confirmPassword,
   }: InputValues) => {
+    console.log({ name, username, email, password, confirmPassword });
     if (password !== confirmPassword) {
       return dispatch(setAuthError('Both passwords need to match.'));
     }
-    dispatch(signup({ username, password }));
+    console.log({ name, username, email, password });
+    dispatch(signup({ name, username, email, password }));
   };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
+
 
   return (
-    <div>
-      <Paper className={classes.root} elevation={2}>
+    <div style={{ width: isMobile ? '100%' : '40%', margin: 'auto', marginTop: '5rem' }}>
+      <Paper className={classes.root} elevation={2} style={{padding: isMobile ? '1rem' : '2rem'}}>
         <img src={TaskIcon} alt="task-logo" className={classes.titleLogo} />
         <form onSubmit={handleSubmit(handleSignup)} className={classes.form}>
+          <div className={classes.inputField}>
+            <TextField
+              required
+              fullWidth
+              inputRef={register}
+              name="name"
+              type="text"
+              label="Name"
+              variant="outlined"
+              error={'name' in errors}
+              helperText={'name' in errors ? errors.name.message : ''}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <NameIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
           <div className={classes.inputField}>
             <TextField
               required
@@ -98,6 +141,26 @@ const SignupPage = () => {
                 startAdornment: (
                   <InputAdornment position="start">
                     <PersonIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
+          <div className={classes.inputField}>
+            <TextField
+              required
+              fullWidth
+              inputRef={register}
+              name="email"
+              type="email"
+              label="Email"
+              variant="outlined"
+              error={'email' in errors}
+              helperText={'email' in errors ? errors.email.message : ''}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon color="primary" />
                   </InputAdornment>
                 ),
               }}
@@ -170,6 +233,38 @@ const SignupPage = () => {
                 ),
               }}
             />
+          </div>
+          <div className={classes.inputField}>
+          <TextField
+              required
+              fullWidth
+              inputRef={register}
+              name="enterCode"
+              type="text"
+              label="Enter Code"
+              variant="outlined"
+              error={'enterCode' in errors}
+              helperText={'enterCode' in errors ? errors.enterCode.message : ''}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <NameIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              color="primary"
+              variant="contained"
+              size="small"
+              startIcon={<PersonAddIcon />}
+              type="submit"
+              className={classes.submitButton}
+              disabled={loading}
+
+            >
+              Send Code
+            </Button>
           </div>
           <Button
             color="primary"

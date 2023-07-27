@@ -14,8 +14,13 @@ interface TaskErrors {
   priority?: string;
 }
 
-export const registerValidator = (username: string, password: string) => {
+export const registerValidator = ( name: string, username: string, email: string, password: string) => {
   const errors: AuthErrors = {};
+
+  if (!name || name.trim() === '' || name.length > 60 || name.length < 3) {
+    errors.username = 'Name must be in range of 3-60 characters length.';
+  }
+  
 
   if (
     !username ||
@@ -28,6 +33,10 @@ export const registerValidator = (username: string, password: string) => {
 
   if (!/^[a-zA-Z0-9-_]*$/.test(username)) {
     errors.username = 'Username must have alphanumeric characters only.';
+  }
+
+  if (!email || email.trim() === '') {
+    email = 'Email field must not be empty.';
   }
 
   if (!password || password.length < 6) {

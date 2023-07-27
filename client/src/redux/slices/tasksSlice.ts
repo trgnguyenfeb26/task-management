@@ -273,13 +273,14 @@ export const editTask = (
         title,
         description,
         priority,
+        assignedUsers,
         updatedAt,
         updatedBy,
       } = updatedTask as EditedTaskData;
 
       dispatch(
         updateTask({
-          data: { title, description, priority, updatedAt, updatedBy },
+          data: { title, description, priority, assignedUsers, updatedAt, updatedBy },
           taskId,
           projectId,
         })

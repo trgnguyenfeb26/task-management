@@ -8,7 +8,6 @@ import {
   selectAuthState,
 } from '../../redux/slices/authSlice';
 import ErrorBox from '../../components/ErrorBox';
-import DemoCredsBox from '../../components/DemoCredsBox';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TaskIcon from '../../svg/task-logo.svg';
@@ -21,6 +20,8 @@ import {
   IconButton,
   Link,
   Paper,
+  useTheme,
+  useMediaQuery,
 } from '@material-ui/core';
 import { useAuthPageStyles } from '../../styles/muiStyles';
 import PersonIcon from '@material-ui/icons/Person';
@@ -52,10 +53,13 @@ const LoginPage = () => {
   const handleLogin = ({ username, password }: InputValues) => {
     dispatch(login({ username, password }));
   };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
+
 
   return (
-    <div>
-      <Paper className={classes.root} elevation={2}>
+    <div style={{ width: isMobile ? '100%' : '40%', margin: 'auto', marginTop: '5rem' }}>
+      <Paper className={classes.root} elevation={2} style={{padding: isMobile ? '1rem' : '2rem'}}>
         <img src={TaskIcon} alt="task-logo" className={classes.titleLogo} />
         <form onSubmit={handleSubmit(handleLogin)} className={classes.form}>
           <div className={classes.inputField}>
@@ -121,7 +125,7 @@ const LoginPage = () => {
             Log In
           </Button>
         </form>
-        <Typography variant="body1" className={classes.footerText}>
+        <Typography variant="body1" className={classes.footerText} style={{padding: '1rem'}}>
           Don’t have an account?{' '}
           <Link
             className={classes.link}
@@ -138,7 +142,6 @@ const LoginPage = () => {
             clearErrorMsg={() => dispatch(clearAuthError())}
           />
         )}
-        <DemoCredsBox />
       </Paper>
     </div>
   );
